@@ -25,13 +25,21 @@ wrangler.jsonc           Worker "poblacio-balears", workers_dev:false, assets: w
 
 ## Rebuild the data
 
+Use the **Nix** Python, never conda/miniforge (`nix run nixpkgs#python3 -- …`):
+
 ```
-python3 src/fetch_ibestat.py     # -> data/raw/*.jsonstat.json
-python3 src/build_web_data.py    # -> web/site_data/poblacio.json
+nix run nixpkgs#python3 -- src/fetch_ibestat.py      # -> data/raw/*.jsonstat.json
+nix run nixpkgs#python3 -- src/build_web_data.py     # -> web/site_data/poblacio.json
+nix run nixpkgs#python3 -- src/fetch_boundaries.py   # -> data/raw/municipis_ideib.json (IDEIB, paged+generalized)
+nix shell nixpkgs#gdal --command \
+  ogr2ogr -f GeoJSON -t_srs EPSG:4326 -where "ID IS NOT NULL" -nln municipis \
+    web/site_data/municipis.geojson ESRIJSON:data/raw/municipis_ideib.json
 ```
 
-Stdlib only. The IBESTAT download needs the session-cookie two-step (open
-`tabla.do?px=` then download `typeDownload=6`) — already handled in the fetcher.
+Stdlib only for the Python. The IBESTAT download needs the session-cookie two-step
+(open `tabla.do?px=` then download `typeDownload=6`); the IDEIB boundaries need
+paging + `maxAllowableOffset` generalization (server 500s otherwise) — both
+handled in the fetchers. See `docs/SOURCES.md`.
 
 ## Data model (`web/site_data/poblacio.json`)
 
@@ -49,7 +57,11 @@ Workers-Builds Git connection — keep it that way, like the rest of the fleet).
 
 ## Backlog
 
+- [x] Animated choropleth map (Mapa tab): IDEIB boundaries + population/density,
+  year slider, Play, log colour scale. Boundaries via `src/fetch_boundaries.py`.
 - Extend back to Segle XVIII (Aranda 1768, Floridablanca 1787, Godoy 1797) as
   separate JAXI tables → one diachronic axis of ~250 years.
-- Optional: municipal coordinates (NGIB, from `meta`) for a map view; growth
-  small-multiples; per-decade change.
+- The richer per-census tables (age×sex pyramids, literacy, occupation, birthplace,
+  fertility, foreign population) — see the roadmap. Aggregate-level for most vars.
+- Optional: growth small-multiples; per-decade change; density on the map already
+  done.

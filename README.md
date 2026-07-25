@@ -30,7 +30,12 @@ municipalities sum to the island/Balears totals wherever municipal data exists.
 ```
 src/fetch_ibestat.py    ▶ data/raw/poblacio_1857_2011.jsonstat.json   (JAXI download, session cookie)
 src/build_web_data.py   ▶ web/site_data/poblacio.json                 (flatten cube, "." -> null, verify sums)
+src/fetch_boundaries.py ▶ data/raw/municipis_ideib.json               (IDEIB municipal limits, paged + generalized)
+  + GDAL ogr2ogr        ▶ web/site_data/municipis.geojson             (reproject 25831->4326, drop stray, join by INE code)
 ```
+
+The GDAL step (run via Nix — `nix shell nixpkgs#gdal`):
+`ogr2ogr -f GeoJSON -t_srs EPSG:4326 -where "ID IS NOT NULL" -nln municipis web/site_data/municipis.geojson ESRIJSON:data/raw/municipis_ideib.json`
 
 No build step for the web: `web/index.html` + `web/app.js` + `web/style.css`.
 Run the pipeline with the standard library only (`python3 src/fetch_ibestat.py &&
@@ -40,10 +45,14 @@ python3 src/build_web_data.py`); see `requirements.txt` for optional extras.
 
 Tabs: **Inici** (what the site shows, *de dret* vs *de fet*, the source),
 **Evolució** (an interactive line chart — the islands, the Balears total, or any
-municipality; toggle *de dret*/*de fet*), **Municipis** (a sortable table:
-population at any census, historical peak, growth), **Font** (method &
-attribution). The chart is inline SVG — no external libraries — under a strict
-CSP (`web/_headers`).
+municipality; toggle *de dret*/*de fet*), **Mapa** (an animated choropleth of the
+67 municipalities: population or density, a year slider across the 17 censuses,
+and a Play button; log colour scale fixed across years so growth is visible),
+**Municipis** (a sortable table: population at any census, historical peak,
+growth), **Font** (method & attribution). The chart and the map are inline SVG —
+no external libraries, no tiles — under a strict CSP (`web/_headers`).
+
+Boundaries: IDEIB / IGN municipal limits (see `docs/SOURCES.md`).
 
 Local preview: `python3 web/dev_server.py` → <http://localhost:8175/>.
 Deploy: pushed to `main` → GitHub Actions → Cloudflare Worker `poblacio-balears`

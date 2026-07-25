@@ -24,6 +24,7 @@
 <nav class="tabs">
   <button class="tab active" data-tab="inici">Inici</button>
   <button class="tab"        data-tab="evolucio">Evolució</button>
+  <button class="tab"        data-tab="mapa">Mapa</button>
   <button class="tab"        data-tab="municipis">Municipis</button>
   <button class="tab"        data-tab="font">Font</button>
 </nav>
@@ -119,6 +120,34 @@
     <p class="chart-note" id="ev-note"></p>
     <div id="ev-chart" class="chart-svg-wrap"></div>
     <div id="ev-legend" class="chart-legend"></div>
+  </div>
+</section>
+
+<!-- ===== MAPA ===== -->
+<section id="tab-mapa" class="tab-content">
+  <div class="chart-card">
+    <div class="chart-head">
+      <h3>Mapa · cens de <span id="map-year-label">…</span></h3>
+      <div class="chart-controls">
+        <label class="ctl">mostra
+          <select id="map-metric">
+            <option value="dret" selected>població de dret</option>
+            <option value="fet">població de fet</option>
+            <option value="densitat">densitat (hab/km²)</option>
+          </select>
+        </label>
+        <button type="button" id="map-play" class="play-btn">▶ Anima</button>
+      </div>
+    </div>
+    <div class="map-slider"><input type="range" id="map-year" aria-label="Any del cens"></div>
+    <p class="chart-note" id="map-note"></p>
+    <div id="map-svg" class="map-wrap"></div>
+    <div class="map-legend">
+      <span id="map-legend-lo" class="mlg-val">…</span>
+      <span class="mlg-bar"></span>
+      <span id="map-legend-hi" class="mlg-val">…</span>
+      <span class="mlg-nodata"><span class="sw-nodata"></span>sense dada</span>
+    </div>
   </div>
 </section>
 

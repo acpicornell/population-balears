@@ -42,10 +42,31 @@ for every census where municipal data exists (e.g. 2011 de dret: 1 100 503).
   `level: "agregat"` and never mixed with the 67 present-day municipalities.
 - **Eivissa and Formentera** appear grouped as a single island in this table.
 
+## Municipal boundaries (for the map)
+
+**IDEIB — `GOIB_UnitAdm_IB` MapServer, layer 1 "Municipis"** (Infraestructura de
+Dades Espacials de les Illes Balears): official IGN "Registro Central de
+Cartografía" municipal limits with the MTIB 1:5000 coastline.
+
+- `https://ideib.caib.es/geoserveis/rest/services/public/GOIB_UnitAdm_IB/MapServer/1`
+- Fetched by `src/fetch_boundaries.py`: native SR is ETRS89/UTM31N (EPSG:25831);
+  server-side reprojection to 4326 returns HTTP 500, and requesting all features
+  at once also 500s, so we page in chunks and request **server-side
+  generalization** (`maxAllowableOffset=100` m) — this turns a ~500k-vertex
+  coastline into ~3k vertices/20 munis and is topology-consistent (shared borders
+  generalize identically, no gaps).
+- Reprojected to WGS84 and written to `web/site_data/municipis.geojson` with GDAL
+  (`ogr2ogr -t_srs EPSG:4326 -where "ID IS NOT NULL"`; the layer carries one
+  attribute-less stray polygon, dropped here). 67 municipalities, keyed by the
+  INE code in `ID`, joining 1:1 to the population data. `AREA_HA` gives density.
+
+Attribution: IDEIB / Institut Geogràfic Nacional (IGN), open data.
+
 ## Licence
 
 Underlying data: IBESTAT open public-sector statistical data — **reusable with
-attribution to IBESTAT**. This repository's code: AGPL-3.0-or-later.
+attribution to IBESTAT**; boundaries © IDEIB/IGN (open, attribution). This
+repository's code: AGPL-3.0-or-later.
 
 ## Extending back to the 18th century (planned)
 

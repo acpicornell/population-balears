@@ -4,8 +4,10 @@ const $  = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 
 let DATA = null;
+let GEO = null;
 let YEARS = [];
 const byCode = new Map();
+const areaKm2 = new Map();
 
 const ISLAND_COLORS = {
   "1": "var(--c-mallorca)",
@@ -24,13 +26,18 @@ function esc(s) {
 
 // ---------- boot ----------
 async function boot() {
-  const res = await fetch("site_data/poblacio.json");
-  DATA = await res.json();
+  const [pj, gj] = await Promise.all([
+    fetch("site_data/poblacio.json").then((r) => r.json()),
+    fetch("site_data/municipis.geojson").then((r) => r.json()),
+  ]);
+  DATA = pj; GEO = gj;
   YEARS = DATA.meta.years;
   DATA.territories.forEach((t) => byCode.set(t.code, t));
+  GEO.features.forEach((f) => areaKm2.set(f.properties.ID, f.properties.AREA_HA / 100));
 
   wireTabs();
   renderInici();
+  buildMapa();
   buildEvolucioControls();
   renderEvolucio();
   buildMunicipisControls();
@@ -249,6 +256,126 @@ function renderMunicipis() {
     renderEvolucio();
     showTab("evolucio");
   }));
+}
+
+// ---------- MAPA (animated choropleth) ----------
+let mapPaths = [];        // [{code, name, d}]
+let mapDomain = null;     // {lo, hi} log-domain for the active metric
+let mapTimer = null;
+const MAP_NODATA = "#e7e1d4";
+
+// municipal value for a given metric at a given year (null if missing)
+function metricValue(code, year, metric) {
+  const t = byCode.get(code);
+  if (!t) return null;
+  if (metric === "densitat") {
+    const v = t.dret[year], a = areaKm2.get(code);
+    return v == null || !a ? null : v / a;
+  }
+  return t[metric][year];   // "dret" | "fet"
+}
+function metricAllYears(metric) {
+  return metric === "densitat" ? YEARS : (metric === "fet" ? YEARS.filter((y) => y <= 1991) : YEARS);
+}
+function computeDomain(metric) {
+  let lo = Infinity, hi = -Infinity;
+  DATA.territories.filter((t) => t.level === "municipi").forEach((t) => {
+    metricAllYears(metric).forEach((y) => {
+      const v = metricValue(t.code, y, metric);
+      if (v != null && v > 0) { if (v < lo) lo = v; if (v > hi) hi = v; }
+    });
+  });
+  return { lo: Math.log(lo), hi: Math.log(hi) };
+}
+function tealRamp(t) {
+  t = Math.max(0, Math.min(1, t));
+  const stops = [[236, 240, 233], [151, 199, 193], [47, 111, 106], [20, 66, 61]];
+  const seg = t * (stops.length - 1), i = Math.min(stops.length - 2, Math.floor(seg)), f = seg - i;
+  const c = stops[i].map((a, j) => Math.round(a + (stops[i + 1][j] - a) * f));
+  return `rgb(${c[0]},${c[1]},${c[2]})`;
+}
+function colorFor(v) {
+  if (v == null || v <= 0) return MAP_NODATA;
+  return tealRamp((Math.log(v) - mapDomain.lo) / (mapDomain.hi - mapDomain.lo));
+}
+
+function buildMapa() {
+  // equirectangular projection with cos(lat) aspect correction
+  let minx = Infinity, miny = Infinity, maxx = -Infinity, maxy = -Infinity;
+  const eachPt = (cb) => GEO.features.forEach((f) => {
+    const g = f.geometry, polys = g.type === "Polygon" ? [g.coordinates] : g.coordinates;
+    polys.forEach((poly) => poly.forEach((ring) => ring.forEach(cb)));
+  });
+  eachPt(([lon, lat]) => { if (lon < minx) minx = lon; if (lon > maxx) maxx = lon; if (lat < miny) miny = lat; if (lat > maxy) maxy = lat; });
+  const k = Math.cos((miny + maxy) / 2 * Math.PI / 180), W = 1000, PAD = 8;
+  const sx = (W - 2 * PAD) / ((maxx - minx) * k);
+  const H = Math.round((maxy - miny) * sx) + 2 * PAD;
+  const proj = ([lon, lat]) => [(PAD + (lon - minx) * k * sx).toFixed(1), (PAD + (maxy - lat) * sx).toFixed(1)];
+  const geomPath = (g) => {
+    const polys = g.type === "Polygon" ? [g.coordinates] : g.coordinates;
+    return polys.map((poly) => poly.map((ring) => "M" + ring.map((p) => proj(p).join(",")).join("L") + "Z").join("")).join("");
+  };
+  mapPaths = GEO.features.map((f) => ({ code: f.properties.ID, name: f.properties.NOM, d: geomPath(f.geometry) }));
+
+  $("#map-svg").innerHTML =
+    `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Mapa de població per municipi">` +
+    mapPaths.map((m) => `<path class="muni" data-code="${m.code}" d="${m.d}"><title></title></path>`).join("") +
+    `</svg>`;
+
+  // year slider over the 17 censuses
+  const sl = $("#map-year");
+  sl.min = 0; sl.max = YEARS.length - 1; sl.step = 1; sl.value = YEARS.length - 1;
+  sl.addEventListener("input", () => { stopPlay(); renderMapa(); });
+  $("#map-metric").addEventListener("change", renderMapa);
+  $("#map-play").addEventListener("click", togglePlay);
+  $$("#map-svg .muni").forEach((p) => p.addEventListener("click", () => {
+    $("#ev-scope").value = "municipi"; $("#ev-muni-wrap").hidden = false;
+    $("#ev-muni").value = p.dataset.code; renderEvolucio(); showTab("evolucio");
+  }));
+  renderMapa();
+}
+
+function currentMapYear() { return YEARS[parseInt($("#map-year").value, 10)]; }
+
+function renderMapa() {
+  const metric = $("#map-metric").value;
+  const year = currentMapYear();
+  mapDomain = computeDomain(metric);
+  const unit = metric === "densitat" ? " hab/km²" : "";
+  $$("#map-svg .muni").forEach((p) => {
+    const v = metricValue(p.dataset.code, year, metric);
+    p.setAttribute("fill", colorFor(v));
+    const name = byCode.get(p.dataset.code)?.name || p.dataset.code;
+    const shown = v == null ? "sense dada"
+      : metric === "densitat" ? fmt(Math.round(v)) + unit : fmt(v);
+    p.querySelector("title").textContent = `${name} · ${year}: ${shown}`;
+  });
+  $("#map-year-label").textContent = DATA.meta.year_labels[year] || year;
+  const mLabel = metric === "dret" ? "població de dret" : metric === "fet" ? "població de fet" : "densitat (hab/km²)";
+  $("#map-note").textContent =
+    `${mLabel[0].toUpperCase() + mLabel.slice(1)} per municipi, cens de ${year}. ` +
+    `Escala de color logarítmica i fixa (comparable entre anys). Els municipis en gris no tenen dada aquell cens ` +
+    `—sovint perquè encara no existien com a municipi independent (segregacions posteriors).` +
+    (metric === "fet" && year > 1991 ? " La població de fet no es publica després de 1991." : "");
+  // legend gradient endpoints
+  $("#map-legend-lo").textContent = fmt(Math.round(Math.exp(mapDomain.lo))) + unit;
+  $("#map-legend-hi").textContent = fmt(Math.round(Math.exp(mapDomain.hi))) + unit;
+}
+
+function togglePlay() { mapTimer ? stopPlay() : startPlay(); }
+function startPlay() {
+  const sl = $("#map-year");
+  if (+sl.value >= YEARS.length - 1) sl.value = 0;
+  $("#map-play").textContent = "⏸ Atura";
+  mapTimer = setInterval(() => {
+    if (+sl.value >= YEARS.length - 1) { stopPlay(); return; }
+    sl.value = +sl.value + 1; renderMapa();
+  }, 900);
+  renderMapa();
+}
+function stopPlay() {
+  if (mapTimer) { clearInterval(mapTimer); mapTimer = null; }
+  $("#map-play").textContent = "▶ Anima";
 }
 
 // ---------- FONT ----------

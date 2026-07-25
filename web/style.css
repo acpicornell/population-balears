@@ -97,6 +97,22 @@ nav.tabs {
 .chart-legend .lg { display: inline-flex; align-items: center; gap: .4em; color: var(--text); }
 .chart-legend .sw { width: 22px; height: 3px; border-radius: 2px; display: inline-block; }
 
+/* ---- map ---- */
+.play-btn { font: inherit; font-size: .85em; padding: .25em .8em; border: 1px solid var(--accent); border-radius: 4px; background: var(--accent-light); color: var(--accent-dark); cursor: pointer; }
+.play-btn:hover { background: var(--accent); color: #fff; }
+.map-slider { margin: .2em 0 .6em; }
+.map-slider input[type=range] { width: 100%; accent-color: var(--accent); }
+.map-wrap { width: 100%; }
+.map-wrap svg { display: block; width: 100%; height: auto; background: #eef4f3; border: 1px solid var(--border); border-radius: 6px; }
+.muni { stroke: #ffffff; stroke-width: .4; cursor: pointer; transition: fill .25s ease; }
+.muni:hover { stroke: var(--accent-dark); stroke-width: 1.1; }
+.map-legend { display: flex; align-items: center; gap: .5em; margin-top: .7em; font-size: .8em; color: var(--text-muted); flex-wrap: wrap; }
+.mlg-bar { flex: 0 0 160px; height: 12px; border-radius: 3px; border: 1px solid var(--border);
+  background: linear-gradient(90deg, rgb(236,240,233), rgb(151,199,193), rgb(47,111,106), rgb(20,66,61)); }
+.mlg-val { font-variant-numeric: tabular-nums; }
+.mlg-nodata { display: inline-flex; align-items: center; gap: .35em; margin-left: .6em; }
+.sw-nodata { width: 13px; height: 13px; border-radius: 2px; background: #e7e1d4; border: 1px solid var(--border); display: inline-block; }
+
 /* ---- table ---- */
 .data-table { width: 100%; border-collapse: collapse; font-size: .92em; }
 .data-table th, .data-table td { padding: .5em .7em; border-bottom: 1px solid var(--border); text-align: left; }
