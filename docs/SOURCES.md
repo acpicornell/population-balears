@@ -40,6 +40,15 @@ for every census where municipal data exists (e.g. 2011 de dret: 1 100 503).
   bridge municipal boundary changes (e.g. Consell segregated from Alaró, es
   Migjorn Gran from es Mercadal, Establiments within Palma). Kept in the data with
   `level: "agregat"` and never mixed with the 67 present-day municipalities.
+  - **Merge reconstruction:** where a modern municipality has no own figure in the
+    early censuses but the comparability rows *sum* to its territory, the early
+    series is reconstructed from that sum and the years are flagged
+    (`reconstructed`, and `meta.reconstruction`). The only case is **Palma**
+    before 1920 = *Palma sense Establiments + Establiments* (annexed 1919); the
+    pieces run 1857–1910 and Palma's own code starts 1920, so there is no overlap.
+  - **Splits are left as gaps:** a combined figure cannot be divided into the
+    modern units, so segregated municipalities stay empty (grey on the map) until
+    they exist separately. Not a data error — the boundary did not yet exist.
 - **Eivissa and Formentera** appear grouped as a single island in this table.
 
 ## Municipal boundaries (for the map)

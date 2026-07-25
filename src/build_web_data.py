@@ -98,6 +98,37 @@ def main() -> None:
             }
         territories.append(rec)
 
+    # --- territorial harmonization (merges only) ---
+    # A few modern municipalities have no own-code figures in the early censuses
+    # because of a past boundary change. Where the change is a *merge* — the
+    # constituent comparability rows sum exactly to the modern territory — we
+    # reconstruct the early series from that sum (marking the years). *Splits*
+    # are left as gaps: the combined figure cannot be divided into the modern
+    # units, so colouring them would invent numbers.
+    MERGES = {
+        # modern code : comparability rows whose sum is the modern territory
+        "07040": ["(Desagregat) Palma sense Establiments",   # Establiments was
+                  "(Desagregat) Establiments"],              # annexed to Palma, 1919
+    }
+    by_name = {t["name"]: t for t in territories}
+    recon_note = {}
+    for code, parts in MERGES.items():
+        muni = next((t for t in territories if t["code"] == code and t["level"] == "municipi"), None)
+        srcs = [by_name[p] for p in parts if p in by_name]
+        if not muni or len(srcs) != len(parts):
+            continue
+        filled = []
+        for concept in ("dret", "fet"):
+            for yk in year_keys:
+                if muni[concept][yk] is None:
+                    vals = [s[concept][yk] for s in srcs]
+                    if any(v is not None for v in vals):
+                        muni[concept][yk] = sum(v or 0 for v in vals)
+                        filled.append(yk)
+        if filled:
+            muni["reconstructed"] = sorted(set(filled), key=int)
+            recon_note[muni["name"]] = {"from": parts, "years": muni["reconstructed"]}
+
     out = {
         "meta": {
             "title": "Població de les Illes Balears · censos de 1857 a 2011",
@@ -119,6 +150,7 @@ def main() -> None:
                 "illes": sum(t["level"] == "illa" for t in territories),
                 "agregats": sum(t["level"] == "agregat" for t in territories),
             },
+            "reconstruction": recon_note,
         },
         "territories": territories,
     }

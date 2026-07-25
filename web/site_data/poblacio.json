@@ -7,7 +7,7 @@
   "source_url": "https://intranet.caib.es/ibestat-jaxi/tabla.do?px=362e6618-6d5f-490a-b6d0-6d40aba64f5d&lang=ca",
   "license": "IBESTAT open public-sector statistical data (attribute IBESTAT)",
   "ibestat_updated": "2012-12-19",
-  "generated": "2026-07-24",
+  "generated": "2026-07-25",
   "years": [
    1857,
    1860,
@@ -38,6 +38,23 @@
    "municipis": 67,
    "illes": 3,
    "agregats": 14
+  },
+  "reconstruction": {
+   "Palma": {
+    "from": [
+     "(Desagregat) Palma sense Establiments",
+     "(Desagregat) Establiments"
+    ],
+    "years": [
+     "1857",
+     "1860",
+     "1877",
+     "1887",
+     "1897",
+     "1900",
+     "1910"
+    ]
+   }
   }
  },
  "territories": [
@@ -1541,13 +1558,13 @@
    "level": "municipi",
    "illa": "Mallorca",
    "dret": {
-    "1857": null,
-    "1860": null,
-    "1877": null,
-    "1887": null,
-    "1897": null,
-    "1900": null,
-    "1910": null,
+    "1857": 52806,
+    "1860": 52009,
+    "1877": 60633,
+    "1887": 62534,
+    "1897": 64112,
+    "1900": 65382,
+    "1910": 69913,
     "1920": 78363,
     "1930": 87746,
     "1940": 117188,
@@ -1560,13 +1577,13 @@
     "2011": 402044
    },
    "fet": {
-    "1857": null,
-    "1860": null,
-    "1877": null,
-    "1887": null,
-    "1897": null,
-    "1900": null,
-    "1910": null,
+    "1857": 53382,
+    "1860": 54526,
+    "1877": 59690,
+    "1887": 62006,
+    "1897": 63982,
+    "1900": 65421,
+    "1910": 69015,
     "1920": 77418,
     "1930": 88262,
     "1940": 114405,
@@ -1577,7 +1594,16 @@
     "1991": 308616,
     "2001": null,
     "2011": null
-   }
+   },
+   "reconstructed": [
+    "1857",
+    "1860",
+    "1877",
+    "1887",
+    "1897",
+    "1900",
+    "1910"
+   ]
   },
   {
    "code": "07041",

@@ -345,10 +345,12 @@ function renderMapa() {
   $$("#map-svg .muni").forEach((p) => {
     const v = metricValue(p.dataset.code, year, metric);
     p.setAttribute("fill", colorFor(v));
-    const name = byCode.get(p.dataset.code)?.name || p.dataset.code;
+    const terr = byCode.get(p.dataset.code);
+    const name = terr?.name || p.dataset.code;
     const shown = v == null ? "sense dada"
       : metric === "densitat" ? fmt(Math.round(v)) + unit : fmt(v);
-    p.querySelector("title").textContent = `${name} · ${year}: ${shown}`;
+    const rec = terr?.reconstructed?.includes(String(year)) ? " (reconstruït)" : "";
+    p.querySelector("title").textContent = `${name} · ${year}: ${shown}${rec}`;
   });
   $("#map-year-label").textContent = DATA.meta.year_labels[year] || year;
   const mLabel = metric === "dret" ? "població de dret" : metric === "fet" ? "població de fet" : "densitat (hab/km²)";
