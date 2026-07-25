@@ -1,0 +1,29 @@
+# Cloudflare Workers (Static Assets) headers config. One rule per block,
+# path + indented header lines. Glob '*' supported.
+#
+# Every asset revalidates on each request; Cloudflare attaches an ETag, so
+# unchanged files come back 304 (no re-download) and new deploys propagate
+# instantly — no stale poblacio.json after a rebuild + push.
+
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/*.json
+  Cache-Control: public, max-age=0, must-revalidate
+
+/*.js
+  Cache-Control: public, max-age=0, must-revalidate
+
+/*.css
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Security headers — read-only static site, no auth, no forms.
+# CSP: script-src 'self' (app.js is same-origin, no inline scripts) kills XSS;
+# style-src allows the handful of inline style="width:…" used for the bars;
+# img-src 'self' data: for the inline SVG favicon. The chart is inline SVG, so
+# no external resources are needed at all.
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()

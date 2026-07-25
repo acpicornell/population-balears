@@ -1,0 +1,17 @@
+# Raw IBESTAT dumps — reproducible from src/fetch_ibestat.py, not redistributed.
+# The repo ships only the derived web/site_data/poblacio.json.
+data/raw/*
+!data/raw/.gitkeep
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+
+# Wrangler / Cloudflare
+.wrangler/
+
+# OS
+.DS_Store

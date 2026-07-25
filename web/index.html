@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<title>Població · Balears · censos 1857–2011</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="L'evolució de la població de les Illes Balears municipi a municipi, des del cens de 1857 fins al de 2011, a partir de les dades oficials d'IBESTAT.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Població · Balears · censos 1857–2011">
+<meta property="og:description" content="Un segle i mig de població balear, municipi a municipi, amb les dades oficials d'IBESTAT.">
+<meta property="og:locale" content="ca_ES">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📈%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="header-content">
+    <h1>Població · Balears</h1>
+    <p class="subtitle">L'evolució de la població de les Illes Balears · censos de 1857 a 2011 · font IBESTAT</p>
+  </div>
+</header>
+
+<nav class="tabs">
+  <button class="tab active" data-tab="inici">Inici</button>
+  <button class="tab"        data-tab="evolucio">Evolució</button>
+  <button class="tab"        data-tab="municipis">Municipis</button>
+  <button class="tab"        data-tab="font">Font</button>
+</nav>
+
+<!-- ===== INICI ===== -->
+<section id="tab-inici" class="tab-content active">
+  <div class="home-hero">
+    <h2>Un segle i mig de població balear</h2>
+    <p class="home-lead">
+      Quanta gent vivia a cada poble de les Illes, cens a cens, entre <strong>1857</strong>
+      i <strong>2011</strong>. Les xifres són les oficials de l'<strong>IBESTAT</strong>,
+      preses dels censos de població.
+    </p>
+    <div class="home-stats" id="home-stats">
+      <div class="home-stat"><span class="num" id="stat-first">…</span><span class="label">habitants el 1857</span></div>
+      <div class="home-stat"><span class="num" id="stat-last">…</span><span class="label">habitants el 2011</span></div>
+      <div class="home-stat"><span class="num" id="stat-mult">…</span><span class="label">de creixement (×)</span></div>
+      <div class="home-stat"><span class="num" id="stat-muni">…</span><span class="label">municipis · 17 censos</span></div>
+    </div>
+  </div>
+
+  <div class="home-prose two-col">
+    <div class="col">
+      <h2>Què mostra aquesta web</h2>
+      <p>
+        Entre 1857 i 2011 l'estat espanyol va fer <strong>disset censos</strong> de població.
+        Aquesta web reuneix la sèrie completa per a les <strong>Illes Balears</strong>, cada
+        <strong>illa</strong> i cada <strong>municipi</strong>, perquè es pugui veure d'un cop
+        el creixement, l'estancament o el declivi de cada lloc al llarg de <strong>154 anys</strong>.
+      </p>
+      <p>
+        És el tram modern d'un eix més llarg: els censos històrics del segle XVIII
+        (<em>Aranda</em> 1768, <em>Floridablanca</em> 1787, <em>Godoy</em> 1797) permeten
+        allargar la mirada fins a prop de dos segles i mig. S'incorporaran més endavant.
+      </p>
+      <h2>Població «de dret» i «de fet»</h2>
+      <p>
+        Cada cens dóna dues xifres. La <strong>població de dret</strong> compta els residents
+        habituals (empadronats); la <strong>població de fet</strong> compta qui hi era
+        físicament la nit del cens (inclou transeünts, exclou absents). En una vila portuària
+        o turística les dues xifres poden divergir força. Els censos recents (des de 2001)
+        ja només publiquen la de dret, per això la de fet apareix buida al final.
+      </p>
+    </div>
+    <div class="col">
+      <h2>La font</h2>
+      <p>
+        Totes les xifres provenen de la taula <em>«Població de dret i de fet per illa i
+        municipi. Censos de 1857 a 2011»</em> de l'<strong>IBESTAT</strong> (Institut
+        d'Estadística de les Illes Balears), descarregada del seu portal estadístic i
+        transformada sense retocar cap valor. És <strong>dada pública reutilitzable</strong>
+        amb atribució a l'IBESTAT.
+      </p>
+      <h2>Cauteles</h2>
+      <ul class="source-links">
+        <li>El cens de <strong>1897</strong> és provisional a la font.</li>
+        <li>La població <strong>de dret per municipi</strong> no es publica per als censos
+          més antics: on falta, la cel·la queda buida (no és un zero).</li>
+        <li>Els límits municipals han canviat (segregacions com Consell, es Migjorn Gran…).
+          La font inclou files <strong>«agregades»</strong> per poder comparar sèries a
+          través d'aquests canvis; aquí es mantenen a part, marcades.</li>
+      </ul>
+      <p class="method-note">Cap xifra és inventada; totes surten directament de la taula
+        oficial. Reproducció al detall a la pestanya <strong>Font</strong>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== EVOLUCIÓ ===== -->
+<section id="tab-evolucio" class="tab-content">
+  <div class="chart-card">
+    <div class="chart-head">
+      <h3>Evolució de la població</h3>
+      <div class="chart-controls">
+        <label class="ctl">mostra
+          <select id="ev-scope">
+            <option value="illes" selected>les illes</option>
+            <option value="balears">total Balears</option>
+            <option value="municipi">un municipi…</option>
+          </select>
+        </label>
+        <label class="ctl" id="ev-muni-wrap" hidden>municipi
+          <select id="ev-muni"></select>
+        </label>
+        <label class="ctl">població
+          <select id="ev-concept">
+            <option value="dret" selected>de dret</option>
+            <option value="fet">de fet</option>
+          </select>
+        </label>
+      </div>
+    </div>
+    <p class="chart-note" id="ev-note"></p>
+    <div id="ev-chart" class="chart-svg-wrap"></div>
+    <div id="ev-legend" class="chart-legend"></div>
+  </div>
+</section>
+
+<!-- ===== MUNICIPIS ===== -->
+<section id="tab-municipis" class="tab-content">
+  <div class="chart-card">
+    <div class="chart-head">
+      <h3>Municipis</h3>
+      <div class="chart-controls">
+        <label class="ctl">cens
+          <select id="mn-year"></select>
+        </label>
+        <label class="ctl">població
+          <select id="mn-concept">
+            <option value="dret" selected>de dret</option>
+            <option value="fet">de fet</option>
+          </select>
+        </label>
+        <label class="ctl">illa
+          <select id="mn-illa"><option value="">totes</option></select>
+        </label>
+      </div>
+    </div>
+    <p class="chart-note">Població al cens triat i creixement des del primer cens amb dada per a cada municipi. Clica una capçalera per ordenar; clica una fila per veure'n la sèrie a <em>Evolució</em>.</p>
+    <table class="data-table" id="mn-table">
+      <thead><tr>
+        <th class="sortable" data-k="name">Municipi</th>
+        <th class="sortable" data-k="illa">Illa</th>
+        <th class="sortable num" data-k="pop">Població</th>
+        <th class="sortable num" data-k="peak" title="Població màxima i any">Màxim</th>
+        <th class="sortable num" data-k="growth" title="Variació entre el primer i el darrer cens amb dada">Creix.</th>
+      </tr></thead>
+      <tbody id="mn-body"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ===== FONT ===== -->
+<section id="tab-font" class="tab-content">
+  <div class="home-hero"><h2>Font i mètode</h2></div>
+  <div class="home-prose two-col">
+    <div class="col">
+      <h2>La taula d'origen</h2>
+      <p id="src-line">…</p>
+      <p>
+        Totes les xifres surten d'una sola taula de l'<strong>IBESTAT</strong>:
+        <em>«Població de dret i de fet per illa i municipi. Censos de 1857 a 2011»</em>,
+        publicada al seu portal estadístic històric. Es descarrega en format
+        <strong>JSON-stat</strong> i es transforma a la taula que llegeix aquesta web,
+        <strong>sense modificar cap valor</strong>.
+      </p>
+      <h2>Com s'ha construït</h2>
+      <p>
+        Un guió (<code>src/fetch_ibestat.py</code>) baixa la taula oficial i un segon
+        (<code>src/build_web_data.py</code>) l'aplana a un registre per territori amb les
+        sèries <em>de dret</em> i <em>de fet</em> per any. Les cel·les buides de la font
+        («.») es mantenen com a <strong>buides</strong>, mai com a zero. Verificació
+        automàtica: la suma dels municipis quadra amb el total de les Illes.
+      </p>
+    </div>
+    <div class="col">
+      <h2>Precisions</h2>
+      <ul class="source-links">
+        <li><strong>De dret / de fet:</strong> residents habituals vs. presents la nit del
+          cens. Des de 2001 només es publica la de dret.</li>
+        <li><strong>1897:</strong> provisional a la font.</li>
+        <li><strong>Files «(Agregat)» i «(Desagregat)»:</strong> la font les afegeix per
+          comparar sèries a través de segregacions municipals (Consell, es Migjorn Gran,
+          Establiments…). Aquí es guarden marcades com a <em>agregat</em> i no es barregen
+          amb els municipis actuals.</li>
+        <li><strong>Eivissa i Formentera</strong> consten agrupades com una sola illa a la
+          taula d'origen.</li>
+      </ul>
+      <h2>Llicència i citació</h2>
+      <p>
+        Dades: IBESTAT, <strong>dada estadística pública reutilitzable amb atribució</strong>.
+        Codi d'aquesta web: AGPL-3.0-or-later.
+      </p>
+      <p class="source-card" id="cite-box">…</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>
+    <strong>Població · Balears</strong> — part del projecte
+    <a href="https://corpusbalear.org/">Corpus Balear</a>.
+    Codi <a href="https://github.com/acpicornell/population-balears">AGPL-3.0-or-later</a> ·
+    dades © IBESTAT (reutilització amb atribució) ·
+    web © 2026 Antoni C. Picornell Company, <a href="https://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC 4.0</a>.
+  </p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+# The pipeline (src/fetch_ibestat.py, src/build_web_data.py) uses only the
+# Python standard library — no third-party packages required to build the site.
+#
+# Optional, for extending the study (map coordinates, heavier analysis):
+# pandas>=2.0
+# requests>=2.31
