@@ -15,8 +15,87 @@
   --c-menorca: #b5872a;
   --c-eivissa: #8a4b8f;
   --c-balears: #444;
+  --header-top: #e9f1f0;
+  --on-accent: #fff;
+  --map-bg: #eef4f3;
+  --map-nodata: #e7e1d4;
+  --map-edge: #ffffff;
+  --grow: #2c6e2c; --shrink: #a2402f;
   font-synthesis: none;
 }
+
+/* Dark theme, as on the sibling sites: defined once for "the system is dark
+   and the reader has not chosen light" and once for "the reader chose dark"
+   (theme.js sets data-theme on <html> before the first paint). The map's
+   teal ramp is data and runs light-to-dark in both themes; only the sea,
+   the borders and the no-data fill follow the theme. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #131614;
+    --surface: #1b201e;
+    --text: #e6e9e4;
+    --text-muted: #a2aba4;
+    --accent: #5fb3ab;
+    --accent-dark: #9ad6cf;
+    --accent-light: #1f3331;
+    --border: #2f3734;
+    --num-bg: #212725;
+    --male: #5fb3ab;
+    --grid: #262d2a;
+    --c-mallorca: #5fb3ab;
+    --c-menorca: #d9ab4a;
+    --c-eivissa: #c08ac4;
+    --c-balears: #c8c8c8;
+    --header-top: #18211f;
+    --on-accent: #0e1a19;
+    --map-bg: #18201e;
+    --map-nodata: #3a3833;
+    --map-edge: #131614;
+    --grow: #79c47a; --shrink: #e58a77;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #131614;
+  --surface: #1b201e;
+  --text: #e6e9e4;
+  --text-muted: #a2aba4;
+  --accent: #5fb3ab;
+  --accent-dark: #9ad6cf;
+  --accent-light: #1f3331;
+  --border: #2f3734;
+  --num-bg: #212725;
+  --male: #5fb3ab;
+  --grid: #262d2a;
+  --c-mallorca: #5fb3ab;
+  --c-menorca: #d9ab4a;
+  --c-eivissa: #c08ac4;
+  --c-balears: #c8c8c8;
+  --header-top: #18211f;
+  --on-accent: #0e1a19;
+  --map-bg: #18201e;
+  --map-nodata: #3a3833;
+  --map-edge: #131614;
+  --grow: #79c47a; --shrink: #e58a77;
+  color-scheme: dark;
+}
+:root[data-theme="light"] { color-scheme: light; }
+
+/* Light/dark toggle (theme.js). */
+.theme {
+  float: right;
+  margin-left: 12px;
+  display: grid;
+  place-items: center;
+  background: none;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px;
+  color: var(--text-muted);
+}
+.theme:hover { color: var(--accent); border-color: var(--accent); }
+.theme:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
 * { box-sizing: border-box; }
 body {
@@ -27,7 +106,7 @@ body {
 
 header {
   border-bottom: 1px solid var(--border);
-  background: linear-gradient(180deg, #e9f1f0 0%, var(--bg) 100%);
+  background: linear-gradient(180deg, var(--header-top) 0%, var(--bg) 100%);
   padding: 1.8em 0 1.3em;
 }
 .header-content { max-width: 1320px; margin: 0 auto; padding: 0 2em; }
@@ -99,19 +178,19 @@ nav.tabs {
 
 /* ---- map ---- */
 .play-btn { font: inherit; font-size: .85em; padding: .25em .8em; border: 1px solid var(--accent); border-radius: 4px; background: var(--accent-light); color: var(--accent-dark); cursor: pointer; }
-.play-btn:hover { background: var(--accent); color: #fff; }
+.play-btn:hover { background: var(--accent); color: var(--on-accent); }
 .map-slider { margin: .2em 0 .6em; }
 .map-slider input[type=range] { width: 100%; accent-color: var(--accent); }
 .map-wrap { width: 100%; }
-.map-wrap svg { display: block; width: 100%; height: auto; background: #eef4f3; border: 1px solid var(--border); border-radius: 6px; }
-.muni { stroke: #ffffff; stroke-width: .4; cursor: pointer; transition: fill .25s ease; }
+.map-wrap svg { display: block; width: 100%; height: auto; background: var(--map-bg); border: 1px solid var(--border); border-radius: 6px; }
+.muni { stroke: var(--map-edge); stroke-width: .4; cursor: pointer; transition: fill .25s ease; }
 .muni:hover { stroke: var(--accent-dark); stroke-width: 1.1; }
 .map-legend { display: flex; align-items: center; gap: .5em; margin-top: .7em; font-size: .8em; color: var(--text-muted); flex-wrap: wrap; }
 .mlg-bar { flex: 0 0 160px; height: 12px; border-radius: 3px; border: 1px solid var(--border);
   background: linear-gradient(90deg, rgb(236,240,233), rgb(151,199,193), rgb(47,111,106), rgb(20,66,61)); }
 .mlg-val { font-variant-numeric: tabular-nums; }
 .mlg-nodata { display: inline-flex; align-items: center; gap: .35em; margin-left: .6em; }
-.sw-nodata { width: 13px; height: 13px; border-radius: 2px; background: #e7e1d4; border: 1px solid var(--border); display: inline-block; }
+.sw-nodata { width: 13px; height: 13px; border-radius: 2px; background: var(--map-nodata); border: 1px solid var(--border); display: inline-block; }
 
 /* ---- table ---- */
 .data-table { width: 100%; border-collapse: collapse; font-size: .92em; }
@@ -123,7 +202,7 @@ nav.tabs {
 .data-table tbody tr { cursor: pointer; }
 .data-table tbody tr:hover { background: var(--accent-light); }
 .data-table td.muted { color: var(--text-muted); }
-.growth-pos { color: #2c6e2c; } .growth-neg { color: #a2402f; }
+.growth-pos { color: var(--grow); } .growth-neg { color: var(--shrink); }
 .peak-year { color: var(--text-muted); font-size: .85em; }
 
 footer { max-width: 1320px; margin: 1em auto 2em; padding: 1.2em 2em; color: var(--text-muted); font-size: .85em; border-top: 1px solid var(--border); text-align: center; }

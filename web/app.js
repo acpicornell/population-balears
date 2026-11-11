@@ -262,7 +262,8 @@ function renderMunicipis() {
 let mapPaths = [];        // [{code, name, d}]
 let mapDomain = null;     // {lo, hi} log-domain for the active metric
 let mapTimer = null;
-const MAP_NODATA = "#e7e1d4";
+// The no-data fill follows the theme (style.css, --map-nodata).
+const MAP_NODATA = "var(--map-nodata)";
 
 // municipal value for a given metric at a given year (null if missing)
 function metricValue(code, year, metric) {
@@ -344,7 +345,9 @@ function renderMapa() {
   const unit = metric === "densitat" ? " hab/km²" : "";
   $$("#map-svg .muni").forEach((p) => {
     const v = metricValue(p.dataset.code, year, metric);
-    p.setAttribute("fill", colorFor(v));
+    // A style, not the fill attribute: the no-data colour is a CSS variable,
+    // which a presentation attribute cannot resolve.
+    p.style.fill = colorFor(v);
     const terr = byCode.get(p.dataset.code);
     const name = terr?.name || p.dataset.code;
     const shown = v == null ? "sense dada"
